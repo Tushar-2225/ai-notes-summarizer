@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Notes Summarizer & Flashcard Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; text-align: center; margin-top: 40px; }
+        h1 { color: #333; }
+        textarea { width: 60%; height: 150px; margin-top: 20px; padding: 10px; }
+        button { background-color: #4CAF50; color: white; padding: 10px 20px; margin-top: 10px; border: none; cursor: pointer; border-radius: 5px; }
+        button:hover { background-color: #45a049; }
+        .output, .flashcards { width: 60%; background: white; margin: 30px auto; padding: 20px; text-align: left; border-radius: 10px; }
+        .flashcard { background: #eef; margin: 10px 0; padding: 10px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>AI-Powered Notes Summarizer</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="text" placeholder="Paste your notes here..."></textarea><br>
+        <button type="submit" name="summarize">Summarize</button>
+    </form>
+
+    {% if summary %}
+    <div class="output">
+        <h2>Summary:</h2>
+        <p>{{ summary }}</p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="summary" value="{{ summary }}">
+            <button type="submit" name="flashcards">Generate Flashcards</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if flashcards %}
+<div class="flashcards">
+    <h2>Generated Flashcards:</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {% for card in flashcards %}
+            <div class="flashcard">
+                <strong>Q:</strong> {{ card.question }}<br>
+                <strong>A:</strong> {{ card.answer }}
+                <input type="hidden" name="questions[]" value="{{ card.question }}">
+                <input type="hidden" name="answers[]" value="{{ card.answer }}">
+            </div>
+        {% endfor %}
+        <button type="submit" name="download_pdf">Download as PDF</button>
+    </form>
+</div>
+{% endif %}
+
+</body>
+</html>
